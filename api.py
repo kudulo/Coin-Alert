@@ -23,3 +23,5 @@ def post(url, data):
     if response.status_code != 200:
         print("Error", response.status_code, response.json())
     return response
+
+print(request("token&action=tokeninfo&contractaddress=0xd1587ee50e0333f0c4adcf261379a61b1486c5d2&apikey=MS9VCH198TUHHRUAQ3IGSNP7HC7W9AT1BW").json())
