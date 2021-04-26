@@ -2,8 +2,9 @@ import requests
 import filehelper
 
 apikey = filehelper.open_file_cd("apikey.txt").readline()
-apiurl = "https://api.bscscan.com/api?module="
+apiurl = "https://api.nomics.com/v1"
 apiheaders = {"Authorization": "Bearer " + apikey}
+ids = "WINDY"
 
 
 def request(url):
@@ -19,5 +20,14 @@ def post(url, data):
         print("Error", response.status_code, response.json())
     return response
 
+def currency(ids):
+    url = "currencies/ticker?key=" + apikey + "&ids=" + ids + "&interval=1h&per-page=100&page=1"
+    return request(url)
 
-print(request("token&action=tokeninfo&contractaddress=0xd1587ee50e0333f0c4adcf261379a61b1486c5d2&apikey=" + apikey).json())
+
+
+response = request("/currencies/ticker")
+
+import urllib.request
+url = "https://api.nomics.com/v1/currencies/ticker?key="+ apikey + "&ids=BTC&interval=1d&convert=USD&per-page=1&page=1"
+print(urllib.request.urlopen(url).read())
