@@ -1,11 +1,21 @@
 import requests
 import filehelper
+import smtplib, datetime
+from email.message import EmailMessage
+
+email = "your_Email"
+passwd = "hashed password"
+phoneNum = "Your_Phone#"
+
 
 apikey = filehelper.open_file_cd("apikey.txt").readline()
-apiurl = "https://api.nomics.com/v1"
+apiurl = "https://api.coingecko.com/api/v3"
 apiheaders = {"Authorization": "Bearer " + apikey}
-ids = "WINDY"
+id = "dogecoin"
+price = 0.6
+price_low = 0.54
 
+####################################################################################################################################################################################################
 
 def request(url):
     response = requests.get(apiurl + url, headers=apiheaders)
@@ -21,13 +31,47 @@ def post(url, data):
     return response
 
 def currency(ids):
-    url = "currencies/ticker?key=" + apikey + "&ids=" + ids + "&interval=1h&per-page=100&page=1"
+    url = "currencies/ticker?key=" + apikey + "&ids=" + id + "&interval=1h&per-page=100&page=1"
     return request(url)
 
+#####################################################################################################################################################################################################
+
+while True:
+
+    url = "/coins/" +id+ "?localization=en&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false"
+
+    pr = request(url).json()
+
+    pr = pr["market_data"]["current_price"]["usd"]
+    print(pr)
+
+#####################################################################################################################################################################################################
 
 
-response = request("/currencies/ticker")
+    def email_alert(body, to):
+        msg = EmailMessage()
+        msg.set_content(body)
+        msg['to'] = to
 
-import urllib.request
-url = "https://api.nomics.com/v1/currencies/ticker?key="+ apikey + "&ids=BTC&interval=1d&convert=USD&per-page=1&page=1"
-print(urllib.request.urlopen(url).read())
+        user = email
+        password = passwd
+
+        msg['from'] = user
+
+        server = smtplib.SMTP('smtp.gmail.com', 587)
+        server.starttls()
+        server.login(user, password)
+        server.send_message(msg)
+        server.quit()
+
+
+#####################################################################################################################################################################################################
+
+    if pr >= price:
+        price = price * 1.2
+        email_alert(id + " is at " + str(pr), phoneNum + "@vtext.com")
+        print(price)
+    elif pr <= price_low:
+        price_low = price_low * .9
+        email_alert(id + " is at " + str(pr), phoneNum + "@vtext.com")
+        print(price_low)
